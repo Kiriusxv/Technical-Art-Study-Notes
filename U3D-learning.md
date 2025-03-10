@@ -26,7 +26,7 @@ public static void DrawLine(Vector3 start, Vector3 end, Color color = Color.whit
 ```C#
 IEnumerator loadScene(){
     operation = SceneManager.loadSceneAsync(1);
-    //加载完场景不要自动跳转
+    //加载完场景不自动跳转
     operation.allowSceneActivation = false;
     yield return operation;
 }
@@ -38,3 +38,80 @@ operation.progress
 ```
 >ps：0.9到完成一步到位  
 ### Transform的使用  
+常用数据示例 
+```C#
+//获取位置
+transform.position//世界位置 
+transform.localPosition//相对位置，相对于父位置
+//获取旋转
+transform.rotation//四元数
+transform.localRotation
+transform.eulerAngles//欧拉角
+transform.localEulerAngles
+//获取缩放
+transform.localScale
+//向量
+transform.forward
+transform.right
+transform.up
+```
+常用方法示例
+```C#
+//看向0点
+transform.LookAt(Vector3.zero);
+//旋转
+transform.Rotate(Vector.up,1);
+//绕某个物体旋转
+transfoem.RotateAround(Vector3.zero,Vector.up,5);
+//移动
+transform.Translate(Vector.forward * 0.1f);
+```
+父子关系
+```C#
+//获取父物体
+transform.parent.gameObject
+//子物体个数
+transform.childCount
+//解除与子物体的父子关系
+transform.DetachChildren();
+//获取子物体
+Transform trans = transform.Find("Child");
+//获取第零个子物体
+transfoem.GetChild(0)
+//判断一个物体是不是另一个物体的子物体
+bool res = trans.IsChildOd(transform);
+//设置为父物体
+trans.SetParent(transform);
+```
+### PC操作方式（键鼠操作）
+键鼠事件需要时刻监听，故需写在update中
+```C#
+void Update()
+{
+    //鼠标的点击
+    //按下鼠标 0左键 1右键 2滚轮
+    if(Input.GetMouseButtonDown(0){
+        Debug.log("按下了鼠标左键")；
+    })
+    if(Input.GetMouseButton(0){
+        Debug.log("持续按下鼠标左键")；
+    })
+    if(Input.GetMouseButtonup(0)){
+        Debug.log("抬起鼠标左键");
+    }
+
+    //键盘操作
+    //按下键盘按键
+    Input.GetKeyDown(KeyCode.A)
+    //持续按下按键
+    Input.GetKey(KeyCode.A)
+    //抬起键盘按键
+    Input.GetKeyUp(KeyCode.A)
+    //(KeyCode.A)--("a")
+
+}
+```
+### 虚拟轴
+简单来说，虚拟轴就是一个数值在-1~1内的数轴，这个数轴上重要的数值就是-1、0和1。当使用按键模拟一个完整的虚拟轴时需要用到两个按键，即将按键1设置为负轴按键，按键2设置为正轴按键。在没有按下任何按键的时候，虚拟轴的数值为0；在按下按键1的时候，虚拟轴的数值会从0~-1进行过渡；在按下按键2的时候，虚拟轴的数值会从0~1进行过渡，如图所示。  
+![虚拟轴](pic/U3.png)  
+虚拟轴的存在可以整合各个操作设备不同的操作方式
