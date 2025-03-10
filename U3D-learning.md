@@ -114,4 +114,20 @@ void Update()
 ### 虚拟轴
 简单来说，虚拟轴就是一个数值在-1~1内的数轴，这个数轴上重要的数值就是-1、0和1。当使用按键模拟一个完整的虚拟轴时需要用到两个按键，即将按键1设置为负轴按键，按键2设置为正轴按键。在没有按下任何按键的时候，虚拟轴的数值为0；在按下按键1的时候，虚拟轴的数值会从0~-1进行过渡；在按下按键2的时候，虚拟轴的数值会从0~1进行过渡，如图所示。  
 ![虚拟轴](pic/U3.png)  
-虚拟轴的存在可以整合各个操作设备不同的操作方式
+虚拟轴的存在可以整合各个操作设备不同的操作方式  
+```C#
+void Update()
+{
+    //获取水平轴
+    float horizontal = Input.GetAxis("Horizontal")；
+    float vertical = Input.GetAxis("Vertical")；
+    Debug.Log(horizontal + "   "+ vertical );
+    //虚拟按键
+    if(Input.GetButtonDown("Jump"))
+    {
+        Debug.log("空格")；
+    }
+    /* 同上节各种按键触发方式均可类比实现
+    */
+}
+```
