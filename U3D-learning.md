@@ -5,3 +5,15 @@
 脚本的执行顺序除了在生命周期中控制以外，还能够直接在设置中直接进行管理  
 ![脚本执行顺序](pic/U2.png)
 ### 预制体与变体  
+### 欧拉角与四元数 
+### Debug功能
+#### Debug.DrawLine与Debug.DrawRay  
+```C#
+Debug.DrawRay  
+ public static void DrawRay (Vector3 start, Vector3 dir, Color color= Color.white, float duration= 0.0f,bool depthTest= true);  
+
+Debug.DrawLine  
+public static void DrawLine(Vector3 start, Vector3 end, Color color = Color.white, float duration = 0.0f, bool depthTest = true);
+```  
+区别在于传递的参数中，ray传递的是起点与方向，而line传递的是起点与终点，虽然ray直译过来是射线，但是这里用向量理解会更好，因为在unity中画出来的线是有长度的而不是像数学概念中的射线一样无限延伸，其长度取决于传入dir（方向向量）的长度。  
+>ps：画线可以用LineRenderer，或者直接GL画，或者更方便的可以Debug.DrawLine，甚至可以将物理射线画出Debug.DrawRay，但是Debug画出的线只能在调试模式看得到，编译成游戏后将不再出现。
