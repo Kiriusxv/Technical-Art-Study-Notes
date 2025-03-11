@@ -131,3 +131,40 @@ void Update()
     */
 }
 ```
+### 触摸方法
+单点触摸/多点触摸
+```C#
+//开启多点触摸
+Input.multiTouchEnabled = true
+
+//判断单点触摸
+if(Input.touchCount == 1)
+{
+    //触摸对象
+    Touch touch = Input.touches[0];
+    //触摸位置
+    Debug.log(touch.position);
+    //触摸阶段
+    switch (touch.phase)
+    {
+        case TouchPhase.Began;
+        break;
+        case TouchPhase.Moved;
+        break;
+        case TouchPhase.Stationary;
+        break;
+        case TouchPhase.Ended;
+        break;
+        case TouchPhase.Canceled;
+        break;
+    }
+}
+
+//判断多点触摸
+if(Input.touchCount == 2)
+{
+    Touch touch = Input.touches[0];
+    Touch touch1 = Input.touches[1];
+    //
+}
+```
