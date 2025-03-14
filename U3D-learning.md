@@ -174,3 +174,138 @@ if(Input.touchCount == 2)
 点光——灯泡  
 实时/烘培————实时光源时刻计算，烘培固定不变（类似光照贴图）
 >ps：建议动手尝试烘培功能    
+### 摄像机  
+* 透视摄像机：近大远小，与现实相同  
+* 正交摄像机：不论距离，画面大小不变  
+>ps：关于摄影机画面的叠加效果需要动手尝试理解。  
+### 声音的使用  
+audio lisener组件————挂在摄影机上，好像一般只挂一个？    
+Audio Source组件  
+>ps：上手就会了，无需多盐  
+ 相关的方法
+ ```C#
+public AudioClip music;
+public AudioClip se;
+
+//播放器组件
+private AudioSouce player;
+void Start(){
+    player = GetComponent<AudioSource>();
+    //设定播放的音频片段
+    play.clip = music;
+    //循环
+    player.loop = true;
+    //音量
+    player.volume = 0.5f;
+    //播放
+    player.Play();
+
+}
+void Update()
+{
+    //空格切换播放与暂停
+    if(Input.GetKeyDown(KeyCode.Space)){
+        if(play.isPlaying){
+            //暂停
+            play.Pause();
+            //停止
+            play.Stop();
+        }else{
+            //继续
+            play.Unpause();
+            //开始播放
+            player.Play();
+        }
+        //鼠标左键播放音效
+        if(Input.GetMouseButtonDown(0)){
+            play.PlayOneShot(se);
+        }
+    }
+}
+ ```
+>ps：暂停与继相对应，停止与开始，后者的区别是直接结束音乐从头开始。如果是写一些音效的触发直接写一个按键触发播放的效果就行了。  
+### 视频的使用  
+video player————>渲染器纹理  
+UI————>原始图像————>渲染器纹理  
+```C#
+private VideoPlayer player;
+//player = GetComponent<VideoPlayer>();
+```
+>ps：与音频类似  
+### 角色控制器  
+```C#
+private CharaterController player;
+void Start(){
+    player = GetComponent<CharaterController>();
+}
+void Update()
+{
+    //水平轴
+    float horizontal = Input.GetAxis("Horizontal");
+    //垂直轴
+    float vertical = Input.GetAxis("vertical");
+    //创建成一个方向向量
+    Vector3 dir = new Vector3(horizontal,0,vertical);
+    //朝向该方向移动
+    play.SimpleMove(dir);
+}
+```  
+### 物理系统  
+* rigidbody组件：赋予物体刚体的物理属性，可选择开启重力效果，运动学效果；碰撞检测的可选项：离散型可能对高速物体丢失检测；冻结选项：字面意思。  
+### 碰撞检测
+* 碰撞器（Collider）：线框决定碰撞范围，产生碰撞需要有一个物体具有刚体属性
+```C#
+//监听发生碰撞
+private void OnCollisionEnter(Collision collision)
+{
+    //创建一个爆炸物体
+    Instantiate(Prefab,transform.position,Quaternion.identity);
+    //销毁自身
+    Destroy(gameObject);
+    //获取碰撞到的游戏物体
+    Debug.log("collision.gameObject.name");
+}
+//持续碰撞
+private void OnCollisionStay(Collision collision)
+{
+
+} 
+//结束碰撞
+private void OnCollisionExit(Collision collision)
+{
+
+}
+```  
+### 触发效果  
+```C#
+void Update()
+{
+    //水平轴
+    float Horizontal = Input.GetAxis("Horizontal");
+    //垂直轴
+    float vertical = Input.GetAxis("Vertical");
+    //向量
+    Vector3 dir = new Vector3(horizontal,0,vertical);
+    //朝向量方向移动
+    transform.Translate(dir*2*Time.deltaTime);
+}
+```  
+触发器：collider中的触发器选项，打开后其他物体可以穿过该物体  
+```C#
+private void OnTriggerEnter(Collider other)
+{
+    GameObject door = GameObject.Find("Door");
+    if(door==null)
+    {
+        door.SetActive(false);
+    }
+}
+private void OnTriggerStay(Collider other)
+{
+
+}
+private void OnTriggerExit(Collider other)
+{
+
+}
+```
