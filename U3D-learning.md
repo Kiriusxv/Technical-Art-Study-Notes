@@ -308,4 +308,98 @@ private void OnTriggerExit(Collider other)
 {
 
 }
+```  
+### 物理关节 
+* 铰链（Hinge Joint）：绕轴旋转--设定轴的位置--x、y偏移值--速度&力：自动旋转   
+* 弹簧（Spring Joint）：链接在刚体上面，弹簧效果  
+* 固定关节（Fixed Joint）：将物体1固定到物体2上，物体1无法移动，物体2移动则物体1同步动--设定一个力的阈值冲破关节  
+* ......  
+### 物理材质 
+自带的物理材质设置动态静态摩擦力等，这部分教的比较简单，毕竟侧重点不在这一块
+### 射线检测  
+通过摄像机从二维平面射向场景  
+实现：
+```C#
+void Start()
+{
+    //方式1
+    Ray ray = Ray(Vector3.zero,Vector3.up);
+
+}
+void Update()
+{
+    //方式2
+    if(Input.GetMouseButtonDown(0))
+    {
+        //按下鼠标左键发射射线
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //声明一个碰撞信息类
+        RaycastHit hit;
+        //碰撞检测
+        bool res = Physics.Raycast(ray,out hit);
+        //若碰撞到物体，则hit返回内容
+        if(res == true)
+        {
+            Debug.log(hit.point);
+            transform.position = hit.point;
+        }
+        //多检测
+        //RaycastHit[] hits = Physics.RaycastAll(ray,100,1<<10);
+    }
+}
+```  
+### 粒子系统的基本使用  
+* 粒子系统（Particle System）:时间、速度、形状……  
+* 预热：去除部分周期，直接展示完整的
+>ps：需要用的时候再好好看看，目前都是一些基本的编辑器操作  
+### 线条与拖尾效果  
+* Line 物体：位置，顶点数（决定平滑度），循环......  
+相关方法  
+```C#
+void Start()
+{
+    //设点线段位置
+    //获取线段渲染器
+    LineRenderer lineRenderer = GetComponent<LineRenderer>();
+    LineRenderer.positionCount = 3;
+    LineRenderer.SetPosition(0,Vector3.zero);
+    LineRenderer.SetPosition(0,Vector3.one);
+    LineRenderer.SetPosition(0,Vector3.down);
+    //lineRenderer.setp
+}
+``` 
+* 拖尾（Trail）:类似的编辑器操作，物体移动产生拖尾效果，设定相关时间和显示效果等  
+### 动画
+* Animation（旧）：Clip，自动播放，是否总是动画化；
+创作动画--K帧；
+可以通过写脚本去控制动画的触发
+* Animator（新）：控制器，Avatar，  
+控制器即动画的状态机加行动树的控制，可以控制动画的播放状态，可以通过脚本去操作；  
+如
+```C#
+private Animator animator;
+void Start()
+{
+    //获取动画器组件
+    animator = GetComponent<Animator>();
+}
+void Update()
+{
+    if(Input.GetMouseButtonDown(0))
+    {
+        animator.Play("right");
+    }
+}
+```  
+可以通过在状态机中添加触发器结合代码管理一些动画操作
+```C#
+void Update()
+{
+    if(Input.GetKeyDown(KeyCode.F))
+    {
+        //触发pickup参数
+        GetComponent<Animator>().SetTrigger("pickup");
+    }
+}
 ```
+过渡：又退出时间时当你触发转换动画时会播放完当前动画后切换，关闭后可以即时切换  
