@@ -83,6 +83,7 @@ bool res = trans.IsChildOd(transform);
 //设置为父物体
 trans.SetParent(transform);
 ```
+## 交互操作
 ### PC操作方式（键鼠操作）
 键鼠事件需要时刻监听，故需写在update中
 ```C#
@@ -112,7 +113,7 @@ void Update()
 }
 ```
 ### 虚拟轴
-简单来说，虚拟轴就是一个数值在-1~1内的数轴，这个数轴上重要的数值就是-1、0和1。当使用按键模拟一个完整的虚拟轴时需要用到两个按键，即将按键1设置为负轴按键，按键2设置为正轴按键。在没有按下任何按键的时候，虚拟轴的数值为0；在按下按键1的时候，虚拟轴的数值会从0~-1进行过渡；在按下按键2的时候，虚拟轴的数值会从0~1进行过渡，如图所示。  
+简单来说，虚拟轴就是一个数值在(-1,1)内的数轴，这个数轴上重要的数值就是-1、0和1。当使用按键模拟一个完整的虚拟轴时需要用到两个按键，即将按键1设置为负轴按键，按键2设置为正轴按键。在没有按下任何按键的时候，虚拟轴的数值为0；在按下按键1的时候，虚拟轴的数值会从(0,-1)进行过渡；在按下按键2的时候，虚拟轴的数值会从0~1进行过渡，如图所示。  
 ![虚拟轴](pic/U3.png)  
 虚拟轴的存在可以整合各个操作设备不同的操作方式  
 ```C#
@@ -168,6 +169,7 @@ if(Input.touchCount == 2)
     //
 }
 ```
+## 场景布局  
 ### 灯光
 定向灯光的照明效果只和方向有关，与位置无关。——模拟太阳光照
 聚光——手电筒  
@@ -250,6 +252,7 @@ void Update()
     play.SimpleMove(dir);
 }
 ```  
+## 物理系统
 ### 物理系统  
 * rigidbody组件：赋予物体刚体的物理属性，可选择开启重力效果，运动学效果；碰撞检测的可选项：离散型可能对高速物体丢失检测；冻结选项：字面意思。  
 ### 碰撞检测
@@ -369,7 +372,8 @@ void Start()
 }
 ``` 
 * 拖尾（Trail）:类似的编辑器操作，物体移动产生拖尾效果，设定相关时间和显示效果等  
-### 动画
+## 动画  
+### 基础操作
 * Animation（旧）：Clip，自动播放，是否总是动画化；
 创作动画--K帧；
 可以通过写脚本去控制动画的触发
@@ -403,3 +407,126 @@ void Update()
 }
 ```
 过渡：又退出时间时当你触发转换动画时会播放完当前动画后切换，关闭后可以即时切换  
+### 按键控制角色运动  
+```C#
+void Update()
+{
+    //水平轴
+    float horizontal = Input.GetAxis("Horizontal");
+    //垂直轴
+    float vertical = Input.GetAxis("Vertical");
+    //向量
+    Vector3  dir = new Vector3(horizontal , 0, vertical);
+    //当用户按下方向键
+    if(dir! = Vector3.zero)
+    {
+        //面向向量
+        transform.rotation = Quaternion.LookRotation(dir);
+        //播放跑步动画
+        animator.SetBool("IsRun",true);
+        //朝向前方移动
+        transform.Translate(Vector3.forward * 2 * Time.deltaTime);
+    } else 
+    {
+        //播放站立动画
+        animator.SetBool("IsRun",false);
+    }
+}
+```
+>ps：注意去除过渡持续时间，否则容易出现延迟效果
+### 曲线和帧事件  
+* 曲线：提出一个曲线，其中的数值可以提取出来用于控制其他动画或效果；  
+* 帧事件：设定一个时刻设置事件，动画每次到这一帧时执行脚本   
+
+二者主要用于动画与其他动画、特效之间的配合与协同  
+### 混合动画  
+* Blend Tree的使用
+* 走路跑步混合--参数权重  
+### 动画分层  
+* 每个图层具有三种状态：Any State、Entry、Exit  
+* 遮罩功能的使用：可以限定动画播放的范围，如用于同一个人物同时做不同的动作的动画混合  
+### 动捕方案  
+千面动捕  
+做独游可以考虑的低成本方案   
+后面再研究吧  
+## Inverse Kinematics
+### 反向动力学
+* 概念：与正向相反，如我们手的动作本来是从胳膊到手臂到手指，现在我们通过手指的位置反推手臂与胳膊  
+```C#
+private void OnAnimatorIK(int layerIndex)
+{
+    //设置头部IK,固定看向某个方向
+    animator.SetLookAtWeight(1);
+    animator.SetLookAtPosition(target.position);
+    //设置右手IK权重
+    animator.SetIKPositionWeight(AvatarIKGoal.RightHand,1);
+    //是否影响旋转
+    animator.SetIKRotationWeight(AvatorIKGoal.RightHand,1);
+    //设置右手IK
+    animator.SetIKPosition(AvatarIKGoal.RightHand，target.position);
+    animator.SetIKPosition(AvatarIKGoal.RightHand，target.rotation);
+}
+``` 
+商城有现成的ik资源  
+## 导航 
+### Navigation Static 
+窗口--包管理器--Unity注册表--Ai Navigation--安装  
+上手就会了  
+```C#
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Al;
+
+public class PlayerControl : MonoBehaviour
+private NavMeshAgent agent;
+void Start()
+{
+    //获取代理组件
+    agent = GetComponent<NavMeshAgent>0;
+}
+void Update()
+{
+    //如果按下鼠标
+    if (nput.GetMouseButtonDown(o))
+    {
+        //获取点击位置
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit))
+        {
+            //点击位置
+            Vector3 point = hit.point;
+            //设置该位置为导航目标点
+            agent.SetDestination(point);
+        }        
+    }    
+}
+    
+```  
+上述代码实现了一个类似LOL的移动系统
+### 动态障碍物
+将其属性取消NS  
+切割属性的使用--自动门  
+网格链接--跳跃高度--跳跃距离  
+### 导航区域
+可以设置不同区域与区域权重    
+
+## UI系统
+核心组件：画布、事件系统  
+* 渲染模式：  
+覆盖————始终显示摄像机所拍摄的画面的前方，即最前方  
+摄像机————需要有摄像机，可以显示在物体前后  
+世界空间————需要摄像机，可以进行旋转缩放等，前两者始终面向摄像机  
+* 排序次序  
+* UI缩放模式  
+### 锚点与轴心点  
+* Image ：都是一些常规功能，上手就会 
+* 锚点：固定在父物体身上， 图像的位置即相对于锚点的偏移量
+* 轴心点：
+## 文本功能  
+### 按钮
+### 文本框
+### 选项与下拉框
+### 滚动条与滚动视图
+### 面板与布局
